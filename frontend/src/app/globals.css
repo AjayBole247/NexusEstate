@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Consolas", "Courier New", monospace;
+  --font-display: Georgia, "Times New Roman", serif;
+  --color-nexus-50: #eef8ff;
+  --color-nexus-100: #d9efff;
+  --color-nexus-200: #badfff;
+  --color-nexus-300: #8fc8ff;
+  --color-nexus-400: #5ba9f8;
+  --color-nexus-500: #2f86ef;
+  --color-nexus-600: #1668d5;
+  --color-nexus-700: #1452aa;
+  --color-nexus-800: #174683;
+  --color-nexus-900: #173c68;
+  --color-nexus-950: #11253f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
+  --font-body: var(--font-sans);
+  --color-nexus-50: var(--color-nexus-50);
+  --color-nexus-100: var(--color-nexus-100);
+  --color-nexus-200: var(--color-nexus-200);
+  --color-nexus-300: var(--color-nexus-300);
+  --color-nexus-400: var(--color-nexus-400);
+  --color-nexus-500: var(--color-nexus-500);
+  --color-nexus-600: var(--color-nexus-600);
+  --color-nexus-700: var(--color-nexus-700);
+  --color-nexus-800: var(--color-nexus-800);
+  --color-nexus-900: var(--color-nexus-900);
+  --color-nexus-950: var(--color-nexus-950);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #111827;
+}
+
+.property-card {
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
+}
+
+.nexus-gradient {
+  background:
+    radial-gradient(circle at top right, rgba(91, 169, 248, 0.35), transparent 32%),
+    linear-gradient(135deg, var(--color-nexus-950), var(--color-nexus-700));
+}
+
+.nexus-btn-primary,
+.nexus-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.nexus-btn-primary {
+  background: var(--color-nexus-600);
+  color: #ffffff;
+}
+
+.nexus-btn-primary:hover {
+  background: var(--color-nexus-700);
+}
+
+.nexus-btn-outline {
+  border: 1px solid var(--color-nexus-300);
+  background: #ffffff;
+  color: var(--color-nexus-700);
+}
+
+.nexus-btn-outline:hover {
+  border-color: var(--color-nexus-400);
+  background: var(--color-nexus-50);
+}

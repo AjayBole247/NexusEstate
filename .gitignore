@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+.next/
+**/.next/
+.next-app/
+.next-runtime/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs and local debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+frontend/build_cmd_output*.txt
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+
+# Deployment
+.vercel/
+
+# Next.js generated file
+next-env.d.ts
+**/next-env.d.ts
+
+# Ignore leftover nested app scaffold/repo
+frontend/nexus-estate/
