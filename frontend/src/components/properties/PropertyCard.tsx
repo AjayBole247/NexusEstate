@@ -1,9 +1,11 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Heart, MapPin, BedDouble, Bath, Maximize2, TrendingUp, ShieldCheck } from 'lucide-react'
 import type { Property } from '@/lib/data'
 import { formatPrice, formatArea } from '@/lib/utils'
 import { useAppStore } from '@/store/useAppStore'
+import ContactModal from '@/components/properties/ContactModal'
 
 interface PropertyCardProps {
   property: Property
@@ -20,6 +22,7 @@ const tagColors: Record<string, string> = {
 export default function PropertyCard({ property, isRent }: PropertyCardProps) {
   const { wishlist, toggleWishlist } = useAppStore()
   const isWishlisted = wishlist.includes(property.id)
+  const [showContact, setShowContact] = useState(false)
 
   return (
     <div className="property-card group">
@@ -107,11 +110,22 @@ export default function PropertyCard({ property, isRent }: PropertyCardProps) {
           >
             View Details
           </Link>
-          <button className="flex-1 py-2.5 bg-nexus-600 hover:bg-nexus-700 text-white font-medium text-sm rounded-xl transition-colors">
+          <button
+            onClick={() => setShowContact(true)}
+            className="flex-1 py-2.5 bg-nexus-600 hover:bg-nexus-700 text-white font-medium text-sm rounded-xl transition-colors"
+          >
             Contact
           </button>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      {showContact && (
+        <ContactModal
+          property={property}
+          onClose={() => setShowContact(false)}
+        />
+      )}
     </div>
   )
 }
