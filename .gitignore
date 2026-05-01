@@ -38,3 +38,14 @@ next-env.d.ts
 
 # Ignore leftover nested app scaffold/repo
 frontend/nexus-estate/
+
+*.pkl
+ai-service/models/
+
+# Python virtual environment and cache
+venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo

@@ -1,22 +1,23 @@
 const pool = require('../config/db');
 
 class PropertyModel {
-  static async insertProperty(ownerId, listedPrice, location, trueValuation) {
-    const result = await pool.query(
-      'INSERT INTO Properties (owner_id, listed_price, location, true_valuation) VALUES ($1, $2, $3, $4) RETURNING *',
-      [ownerId, listedPrice, location, trueValuation]
-    );
+  static async getPropertyById(id) {
+    const query = `
+      SELECT id, title, listing_type, price, sqft, bhk, bathrooms, locality, city, dist_metro_km, dist_highway_km, has_pool, has_gym, image_url
+      FROM properties
+      WHERE id = $1;
+    `;
+    const result = await pool.query(query, [id]);
     return result.rows[0];
   }
 
-  static async getPropertiesByUser(userId) {
+  static async getAllProperties() {
     const query = `
-      SELECT id, location, listed_price, true_valuation, status, created_at
-      FROM Properties
-      WHERE owner_id = $1
-      ORDER BY created_at DESC;
+      SELECT id, title, listing_type, price, sqft, bhk, bathrooms, locality, city, dist_metro_km, dist_highway_km, has_pool, has_gym, image_url
+      FROM properties
+      ORDER BY city, locality;
     `;
-    const result = await pool.query(query, [userId]);
+    const result = await pool.query(query);
     return result.rows;
   }
 }
