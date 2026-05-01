@@ -1,7 +1,7 @@
 export function formatPrice(value: number, locale = "en-IN", currency = "INR") {
   return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: currency,
+    currency: "INR",
     maximumFractionDigits: 0,
   }).format(value);
 }
