@@ -80,3 +80,37 @@ exports.getUserSwaps = async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 };
+
+exports.getTransactionDetails = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query('SELECT status, lease_chain, expires_at FROM Swap_Transactions WHERE id = $1', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Transaction not found' });
+    const tx = rows[0];
+
+    const chainDetails = [];
+    for (const leaseId of tx.lease_chain) {
+      const leaseRes = await pool.query(`
+        SELECT u.id as user_id, u.full_name as name, p.location as property, p.city, u.role
+        FROM Leases l
+        JOIN Users u ON l.tenant_id = u.id
+        JOIN Properties p ON l.property_id = p.id
+        WHERE l.id = $1
+      `, [leaseId]);
+      if (leaseRes.rows.length > 0) {
+        chainDetails.push({ 
+          id: leaseRes.rows[0].user_id, 
+          name: leaseRes.rows[0].name, 
+          property: leaseRes.rows[0].property, 
+          city: leaseRes.rows[0].city,
+          role: leaseRes.rows[0].role 
+        });
+      }
+    }
+    
+    res.json({ transaction: tx, chain: chainDetails });
+  } catch (err) {
+    console.error('Error fetching tx details:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

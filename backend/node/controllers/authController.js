@@ -24,8 +24,12 @@ exports.googleLogin = async (req, res) => {
       }
     }
 
+    // Map old roles or invalid roles to the new enum
+    const validRoles = ['tenant', 'landlord', 'admin'];
+    const finalRole = validRoles.includes(role) ? role : 'tenant';
+
     // Upsert into DB
-    const dbUser = await UserModel.upsertUser(email, name, role || 'Nomad');
+    const dbUser = await UserModel.upsertUser(email, name, finalRole);
     
     // Create Nexus JWT
     const payload = { id: dbUser.id, email: dbUser.email, name: dbUser.full_name, role: dbUser.role };

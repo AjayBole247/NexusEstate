@@ -12,17 +12,23 @@ export default function SwapDashboard() {
   const [countdown, setCountdown] = useState(60);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [readyUsers, setReadyUsers] = useState<string[]>([]);
-  const [transactionId] = useState("mock-tx-12345"); // In reality, this comes from backend CTE match
+  const [transactionId] = useState("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"); // Seeded tx ID
   
-  // Mock User
-  const currentUser = { id: "user-A", name: "Alice (You)" };
-  
-  // Mock Chain A -> B -> C -> A
-  const swapChain = [
-    { id: "user-A", name: "Alice", property: "Downtown Loft", role: "Nomad" },
-    { id: "user-B", name: "Bob", property: "Suburban House", role: "Nomad" },
-    { id: "user-C", name: "Charlie", property: "Beach Condo", role: "Nomad" }
-  ];
+  const [swapChain, setSwapChain] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState({ id: "", name: "Loading..." });
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/api/swaps/transaction/${transactionId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.chain && data.chain.length > 0) {
+          setSwapChain(data.chain);
+          // Set the current user as the first user in the chain for demo purposes
+          setCurrentUser({ id: data.chain[0].id, name: data.chain[0].name + " (You)" });
+        }
+      })
+      .catch(console.error);
+  }, [transactionId]);
 
   useEffect(() => {
     if (commitMode) {
@@ -135,6 +141,7 @@ export default function SwapDashboard() {
                   </div>
                   <h3 className="font-medium text-white">{node.name}</h3>
                   <p className="text-sm text-blue-400 mt-1">{node.property}</p>
+                  <p className="text-xs text-neutral-500 mt-1">{node.city}</p>
                   
                   <button 
                     onClick={() => setActiveChat(`room-${node.id}`)}
