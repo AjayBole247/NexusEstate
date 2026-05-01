@@ -1,33 +1,132 @@
+"use client";
+
+import { useState } from "react";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { Building2, Home, ArrowRight } from "lucide-react";
+import toast from "react-hot-toast";
+import { useAppStore } from "@/store/useAppStore";
+
+// Ensure you use your actual Google Client ID here
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+
 export default function AuthPage() {
+  const [role, setRole] = useState<"Nomad" | "Investor" | null>(null);
+
+  const handleSuccess = async (credentialResponse: any) => {
+    if (!role) {
+      toast.error("Please select a role first!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3001/api/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: credentialResponse.credential,
+          role,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Authentication failed");
+      const data = await res.json();
+      
+      // Save token (in a real app, use HTTP-only cookies or secure storage)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // Update global store state instantly
+      useAppStore.getState().setUser(data.user);
+      
+      toast.success("Successfully logged in!");
+      // Redirect based on role or to dashboard
+      window.location.href = "/swap";
+    } catch (error) {
+      toast.error("Failed to authenticate with backend.");
+      console.error(error);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    if (!role) {
+      toast.error("Please select a role first!");
+      return;
+    }
+    
+    // Simulate a successful Google token
+    handleSuccess({ credential: "mock-google-jwt-token" });
+  };
+
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12 sm:px-10">
-      <div className="mb-10 space-y-4 text-center">
-        <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Authentication</p>
-        <h1 className="text-4xl font-bold text-slate-950">Login, register, or use Google</h1>
-        <p className="text-base leading-7 text-slate-600">
-          Access your account with OTP verification or sign in quickly using Google OAuth.
-        </p>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-light text-white mb-2">Welcome to NexusEstate</h1>
+            <p className="text-neutral-400">Select your path to continue</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-10">
+            <button
+              onClick={() => setRole("Nomad")}
+              className={`p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
+                role === "Nomad" 
+                  ? "border-blue-500 bg-blue-500/10 text-blue-400" 
+                  : "border-neutral-800 bg-neutral-800/50 text-neutral-500 hover:border-neutral-700"
+              }`}
+            >
+              <Home size={32} />
+              <span className="font-medium">Nomad</span>
+            </button>
+
+            <button
+              onClick={() => setRole("Investor")}
+              className={`p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
+                role === "Investor" 
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-400" 
+                  : "border-neutral-800 bg-neutral-800/50 text-neutral-500 hover:border-neutral-700"
+              }`}
+            >
+              <Building2 size={32} />
+              <span className="font-medium">Investor</span>
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            {role ? (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full flex flex-col items-center gap-4">
+                <GoogleLogin
+                  onSuccess={handleSuccess}
+                  onError={() => {
+                    toast.error("Google Login Failed");
+                  }}
+                  theme="filled_black"
+                  shape="pill"
+                />
+                
+                <div className="relative w-full flex items-center py-2">
+                  <div className="flex-grow border-t border-neutral-800"></div>
+                  <span className="flex-shrink-0 mx-4 text-neutral-600 text-xs">OR</span>
+                  <div className="flex-grow border-t border-neutral-800"></div>
+                </div>
+
+                <button
+                  onClick={handleDemoLogin}
+                  className="w-full max-w-[240px] bg-neutral-800 hover:bg-neutral-700 text-white font-medium py-2.5 px-4 rounded-full transition-colors border border-neutral-700 text-sm"
+                >
+                  Bypass with Demo Account
+                </button>
+              </div>
+            ) : (
+              <div className="text-neutral-500 text-sm flex items-center gap-2">
+                Choose a role to unlock login <ArrowRight size={16} />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold text-slate-950">OTP login</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-600">Enter your phone number to receive a one-time passcode.</p>
-          <label className="mt-6 block text-sm font-medium text-slate-700">
-            Phone number
-            <input className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none" placeholder="+1 555 0100" />
-          </label>
-          <button className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-            Send OTP
-          </button>
-        </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold text-slate-950">Google sign-in</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-600">Use your Google account for a fast and secure login experience.</p>
-          <button className="mt-6 inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-50">
-            Continue with Google
-          </button>
-        </section>
-      </div>
-    </main>
+    </GoogleOAuthProvider>
   );
 }

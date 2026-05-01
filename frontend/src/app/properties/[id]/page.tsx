@@ -3,13 +3,16 @@ import { formatArea, formatPrice } from "@/lib/utils";
 import { sampleProperties } from "@/lib/data";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
+import { use } from 'react';
+
 export default function PropertyDetailPage({ params }: Props) {
-  const property = sampleProperties.find((item) => item.id === params.id);
+  const unwrappedParams = use(params);
+  const property = sampleProperties.find((item) => item.id === unwrappedParams.id);
 
   if (!property) {
     return (
